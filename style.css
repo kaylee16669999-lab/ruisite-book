@@ -1,0 +1,422 @@
+/* ================= 基础重置 ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* ================= 背景 ================= */
+body {
+    width: 100%;
+    height: 100vh;
+    background-image: url("../images/bg.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* 背景加深，让画册更突出 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: -1;
+}
+
+/* ================= 统一舞台容器（立体投影） ================= */
+#stage {
+    width: 1800px;
+    height: 1273px;
+    position: relative;
+    transform-origin: center center;
+    /* 多层落地投影，模拟真书悬浮 */
+    filter: 
+        drop-shadow(0 15px 25px rgba(0, 0, 0, 0.35))
+        drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))
+        drop-shadow(0 60px 120px rgba(0, 0, 0, 0.3));
+}
+
+/* ================= 画册 ================= */
+#book {
+    width: 1800px;
+    height: 1273px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 2px;
+    user-select: none;
+    /* 初始隐藏，只有进入内页时才显示 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* ================= 每一页 ================= */
+.page {
+    width: 900px;
+    height: 1273px;
+    background-color: #f5f5f5;
+    position: relative;
+    overflow: hidden;
+}
+
+.page img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    display: block;
+    background-color: #f5f5f5;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+/* ================= 【核心】书脊中缝阴影 ================= */
+
+/* 左页右边缘：向中心渐变变深 */
+.page.--left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(to left,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.15) 35%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* 右页左边缘：向中心渐变变深 */
+.page.--right::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(to right,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.15) 35%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* 【关键】书脊正中间那条细微的发光缝（模拟反光） */
+#book::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        0 0 6px rgba(255, 255, 255, 0.1),
+        0 0 15px rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+body.cover-closed #book::before {
+    opacity: 1;
+}
+
+/* 纸张厚度 —— 左页左侧亮边 & 右页右侧亮边 */
+.page.--left {
+    box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.2),
+                inset 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+.page.--right {
+    box-shadow: inset -4px 0 6px -4px rgba(0, 0, 0, 0.2),
+                inset -1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ================= 【真 3D】封面 ================= */
+#cover-screen {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 900px;
+    height: 1273px;
+    z-index: 100;
+    background-color: #f5f5f5;
+    overflow: visible;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    /* 【核心】3D 透视，让封面轻微右转 */
+    transform-origin: left center;
+    transform: translateX(-50%) perspective(2500px) rotateY(-4deg);
+}
+
+/* 书脊（左侧叠加的纸叠） */
+#cover-screen::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: -10px;
+    width: 10px;
+    height: calc(100% - 4px);
+    /* 从暗到亮，模拟纸张侧边 */
+    background: linear-gradient(to right,
+        #9a9a9a 0%,
+        #b5b5b5 25%,
+        #d0d0d0 55%,
+        #e8e8e8 100%);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 
+        inset -1px 0 2px rgba(0, 0, 0, 0.15),
+        -2px 0 6px rgba(0, 0, 0, 0.25);
+    /* 书脊自身也跟着倾斜一点 */
+    transform: skewY(-0.3deg);
+    z-index: -1;
+}
+
+/* 书脊与封面的交界凹槽 */
+#cover-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 15px;
+    height: 100%;
+    background: linear-gradient(to right,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.12) 50%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#cover-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ================= 【真 3D】封面 ================= */
+#cover-screen {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 900px;
+    height: 1273px;
+    z-index: 100;
+    background-color: #f5f5f5;
+    overflow: visible;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    
+    /* 3D 透视，固定左侧书脊，封面轻微右转 */
+    transform-origin: left center;
+    transform: translateX(-50%) perspective(2500px) rotateY(-4deg);
+
+    box-shadow: 
+        /* 右侧纸张厚度（保留） */
+        1px 0 0 #ececec,
+        2px 0 0 #e0e0e0,
+        3px 0 0 #d5d5d5,
+        4px 0 0 #c9c9c9,
+        5px 0 0 #bdbdbd,
+        6px 0 0 #b0b0b0,
+        7px 0 0 #a4a4a4,
+        /* 右侧边缘阴影 */
+        10px 8px 18px rgba(0, 0, 0, 0.35),
+        
+        /* 【核心修改】左侧压痕（深色内阴影，深入纸张内部） */
+        inset 12px 0 16px -8px rgba(0, 0, 0, 0.7),
+        inset 2px 0 4px rgba(0, 0, 0, 0.4),
+
+        /* 底部多层落地投影 */
+        0 15px 25px rgba(0, 0, 0, 0.4),
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        0 60px 100px rgba(0, 0, 0, 0.3);
+}
+
+/* 彻底删除左侧的白色 ::before */
+#cover-screen::before {
+    display: none; 
+}
+
+/* 强化压痕 ::after，加深书脊与内容的交界线 */
+#cover-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(to right,
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(0, 0, 0, 0.2) 40%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#cover-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#cover-screen img {
+    width: 100%; height: 100%; object-fit: contain;
+    display: block; -webkit-user-drag: none; pointer-events: none;
+}
+
+
+/* ================= 【真 3D】封底 ================= */
+#back-screen {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 900px;
+    height: 1273px;
+    z-index: 100;
+    background-color: #f5f5f5;
+    overflow: visible;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    
+    transform-origin: right center;
+    transform: translateX(-50%) perspective(2500px) rotateY(4deg);
+
+    box-shadow: 
+        /* 左侧纸张厚度（封底镜像） */
+        -1px 0 0 #ececec,
+        -2px 0 0 #e0e0e0,
+        -3px 0 0 #d5d5d5,
+        -4px 0 0 #c9c9c9,
+        -5px 0 0 #bdbdbd,
+        -6px 0 0 #b0b0b0,
+        -7px 0 0 #a4a4a4,
+        -10px 8px 18px rgba(0, 0, 0, 0.35),
+        
+        /* 【核心修改】封底右侧压痕 */
+        inset -12px 0 16px -8px rgba(0, 0, 0, 0.7),
+        inset -2px 0 4px rgba(0, 0, 0, 0.4),
+
+        /* 底部投影 */
+        0 15px 25px rgba(0, 0, 0, 0.4),
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        0 60px 100px rgba(0, 0, 0, 0.3);
+}
+
+#back-screen::before {
+    display: none;
+}
+
+#back-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(to left,
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(0, 0, 0, 0.2) 40%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#back-screen.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+#back-screen img {
+    width: 100%; height: 100%; object-fit: contain;
+    display: block; -webkit-user-drag: none; pointer-events: none;
+}
+/* ================= 两侧翻页箭头 ================= */
+.nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%); /* 保持垂直居中 */
+    width: 60px;
+    height: 60px;
+    /* 纯色半透明底，彻底去除白边光晕 */
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 24px;
+    font-family: Arial, sans-serif; /* 强制字体统一，避免字符偏移 */
+    line-height: 1;                  /* 【核心】消除字体默认行高带来的上下偏移 */
+    display: flex;
+    justify-content: center;         /* 水平居中 */
+    align-items: center;             /* 垂直居中 */
+    cursor: pointer;
+    z-index: 9999;
+    border-radius: 50%;
+    border: none;                    /* 去掉所有边框 */
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 加个淡淡的黑影代替白光 */
+    transition: background 0.3s ease, transform 0.3s ease;
+    user-select: none;
+    /* 移除 backdrop-filter，它常常导致这种“白色不居中”的错觉 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* 鼠标悬停时加深，不缩放（防止缩放导致视觉偏移） */
+.nav-arrow:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* 左侧箭头定位 */
+#prev-arrow {
+    left: 30px;
+}
+
+/* 右侧箭头定位 */
+#next-arrow {
+    right: 30px;
+}
+
+/* 手机端适配 */
+@media (max-width: 1024px) {
+    .nav-arrow {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    #prev-arrow { left: 15px; }
+    #next-arrow { right: 15px; }
+}
+
+/* ================= 手机端适配 ================= */
+@media (max-width: 1024px) {
+    #stage { width: 100vw; height: auto; }
+    .nav-arrow { width: 45px; height: 45px; font-size: 20px; }
+    #prev-arrow { left: 15px; }
+    #next-arrow { right: 15px; }
+}
+
+/* ================= 隐藏自动生成的空白占位页 ================= */
+.page.--empty {
+    display: none !important;
+}

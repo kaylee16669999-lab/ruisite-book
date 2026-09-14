@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ================= 微信卡片分享配置 ================= -->
+    <!-- 1. 客户在微信里看到的标题 -->
+    <title>河北瑞思特精密技术有限公司宣传册
+    </title>
+    
+    <!-- 2. 客户看到的描述 -->
+    <meta name="description" content="表面处理技术整体解决方案供应商 - 点击查看电子宣传册">
+    
+    <!-- 3. 微信抓取的卡片缩略图（重要：必须等网站上线后，换成你的真实公网图片地址！） -->
+    <!-- 例如：https://你的域名.com/images/logo.jpg -->
+    <meta property="og:image" content="https://你的域名.com/images/logo.jpg">
+    <meta property="og:title" content="河北瑞思特精密技术有限公司画册">
+    <meta property="og:description" content="表面处理技术整体解决方案供应商">
+    <meta property="og:type" content="website">
+    
+    <!-- 微信专用的图片标签，双重保障 -->
+    <meta itemprop="image" content="https://你的域名.com/images/logo.jpg">
+    <!-- ==================================================== -->
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- 统一舞台容器：封面/画册/封底都在这里，同步缩放 -->
+    <div id="stage">
+
+        <!-- 画册（内页 2~117） -->
+        <div id="book"></div>
+
+        <!-- 封面（覆盖在画册上层） -->
+        <div id="cover-screen">
+            <img src="page/1.jpg" alt="封面">
+        </div>
+
+        <!-- 封底（覆盖在画册上层） -->
+        <div id="back-screen">
+            <img src="page/118.jpg" alt="封底">
+        </div>
+
+    </div>
+
+    <!-- 左侧上一页箭头 -->
+    <div id="prev-arrow" class="nav-arrow">❮</div>
+    
+    <!-- 右侧下一页箭头 -->
+    <div id="next-arrow" class="nav-arrow">❯</div>
+
+    <script src="js/page-flip.browser.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
