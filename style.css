@@ -397,25 +397,46 @@ body.cover-closed #book::before {
     right: 30px;
 }
 
-/* 手机端适配 */
+/* ================= 手机端适配（单页模式） ================= */
 @media (max-width: 1024px) {
-    .nav-arrow {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
+    /* 1. 强制画册容器改为单页宽度 900px */
+    #stage {
+        width: 900px;
+        height: 1273px;
     }
-    #prev-arrow { left: 15px; }
-    #next-arrow { right: 15px; }
-}
+    
+    #book {
+        width: 900px;
+        height: 1273px;
+    }
+    
+    .page {
+        width: 900px;
+        height: 1273px;
+    }
 
-/* ================= 手机端适配 ================= */
-@media (max-width: 1024px) {
-    #stage { width: 100vw; height: auto; }
-    .nav-arrow { width: 45px; height: 45px; font-size: 20px; }
-    #prev-arrow { left: 15px; }
-    #next-arrow { right: 15px; }
-}
+    /* 2. 手机端单页显示时，隐藏左右页的书脊阴影（因为不需要双页对开） */
+    .page.--left::after,
+    .page.--right::after {
+        display: none !important;
+    }
 
+    /* 3. 手机端去掉封面/封底的 3D 旋转（容易导致偏移） */
+    #cover-screen, #back-screen {
+        transform: translateX(-50%) !important;
+        left: 50%;
+    }
+
+    /* 4. 调整两侧箭头大小和位置 */
+    .nav-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    #prev-arrow { left: 5px; }
+    #next-arrow { right: 5px; }
+}
 /* ================= 隐藏自动生成的空白占位页 ================= */
 .page.--empty {
     display: none !important;
