@@ -85,28 +85,34 @@ pageFlip.on("flip", function () {
     flipSound.play().catch(e => console.log("音频播放被拦截:", e));
 });
 
-// ============ 自适应缩放（统一缩放 #stage） ============
+// ============ 自适应缩放（手机单页/电脑双页） ============
 function resizeStage() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    // 【新增】判断是否为手机端
+    // 判断是否小屏
     const isMobile = window.innerWidth <= 1024;
     
-    // 【关键修改】手机端按单页宽 900 计算，电脑端按双页宽 1800 计算
+    // 强制设置 Stage 宽度
     const stageWidth = isMobile ? 900 : 1800;
     const stageHeight = 1273;
-    
-    // 手机端留白稍微少一点，让画册更大
-    const scaleX = screenWidth / stageWidth;
-    const scaleY = screenHeight / stageHeight;
-    const scale = Math.min(scaleX, scaleY) * (isMobile ? 0.98 : 0.95);
 
-    stage.style.transform = `scale(${scale})`;
-    stage.style.transformOrigin = 'center center';
+    // 计算缩放
+    let scaleX = screenWidth / stageWidth;
+    let scaleY = screenHeight / stageHeight;
+    // 移动端留白极少，桌面端留 5% 边距
+    let scale = Math.min(scaleX, scaleY) * (isMobile ? 0.98 : 0.95);
     
-    // 【新增】动态设置 stage 的宽度，防止手机端两边出现巨大空白
-    stage.style.width = isMobile ? '900px' : '1800px';
+    // 防止手机被强行放大
+    if (isMobile && scale > 1) scale = 1;
+
+    // 强制绝对居中
+    stage.style.position = 'absolute';
+    stage.style.top = '50%';
+    stage.style.left = '50%';
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    stage.style.transformOrigin = 'center center';
+    stage.style.width = `${stageWidth}px`;  // JS 强行设置宽度
 }
 window.addEventListener('load', resizeStage);
 window.addEventListener('resize', resizeStage);

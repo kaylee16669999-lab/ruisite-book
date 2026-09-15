@@ -161,69 +161,6 @@ body.cover-closed #book::before {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.4s ease, visibility 0.4s ease;
-    /* 【核心】3D 透视，让封面轻微右转 */
-    transform-origin: left center;
-    transform: translateX(-50%) perspective(2500px) rotateY(-4deg);
-}
-
-/* 书脊（左侧叠加的纸叠） */
-#cover-screen::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: -10px;
-    width: 10px;
-    height: calc(100% - 4px);
-    /* 从暗到亮，模拟纸张侧边 */
-    background: linear-gradient(to right,
-        #9a9a9a 0%,
-        #b5b5b5 25%,
-        #d0d0d0 55%,
-        #e8e8e8 100%);
-    border-radius: 2px 0 0 2px;
-    box-shadow: 
-        inset -1px 0 2px rgba(0, 0, 0, 0.15),
-        -2px 0 6px rgba(0, 0, 0, 0.25);
-    /* 书脊自身也跟着倾斜一点 */
-    transform: skewY(-0.3deg);
-    z-index: -1;
-}
-
-/* 书脊与封面的交界凹槽 */
-#cover-screen::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 15px;
-    height: 100%;
-    background: linear-gradient(to right,
-        rgba(0, 0, 0, 0.35) 0%,
-        rgba(0, 0, 0, 0.12) 50%,
-        transparent 100%);
-    pointer-events: none;
-    z-index: 2;
-}
-
-#cover-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-/* ================= 【真 3D】封面 ================= */
-#cover-screen {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 900px;
-    height: 1273px;
-    z-index: 100;
-    background-color: #f5f5f5;
-    overflow: visible;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
     
     /* 3D 透视，固定左侧书脊，封面轻微右转 */
     transform-origin: left center;
@@ -399,45 +336,39 @@ body.cover-closed #book::before {
 
 /* ================= 手机端适配（单页模式） ================= */
 @media (max-width: 1024px) {
-    /* 1. 强制画册容器改为单页宽度 900px */
-    #stage {
-        width: 900px;
-        height: 1273px;
-    }
-    
-    #book {
-        width: 900px;
-        height: 1273px;
-    }
-    
-    .page {
-        width: 900px;
-        height: 1273px;
+    /* 手机端画册宽高改为单页 900px */
+    #stage, #book, .page {
+        width: 900px !important;
+        height: 1273px !important;
     }
 
-    /* 2. 手机端单页显示时，隐藏左右页的书脊阴影（因为不需要双页对开） */
+    /* 手机单页模式，隐藏左右页书脊阴影 */
     .page.--left::after,
     .page.--right::after {
         display: none !important;
     }
 
-    /* 3. 手机端去掉封面/封底的 3D 旋转（容易导致偏移） */
+    /* 手机端去掉 3D 旋转，防止画面偏移 */
     #cover-screen, #back-screen {
         transform: translateX(-50%) !important;
-        left: 50%;
     }
 
-    /* 4. 调整两侧箭头大小和位置 */
+    /* 手机端箭头变小、透明，不挡内容 */
     .nav-arrow {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         font-size: 16px;
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.2);
     }
     #prev-arrow { left: 5px; }
     #next-arrow { right: 5px; }
 }
-/* ================= 隐藏自动生成的空白占位页 ================= */
-.page.--empty {
-    display: none !important;
+
+/* 隐藏自动生成的空白占位页 */
+.page.--empty { display: none !important; }
+/* 【强制保险】手机端强制单页宽度，无视浏览器桌面模式 */
+@media (max-width: 1024px) {
+    #stage, #book, .page {
+        width: 900px !important;
+        height: 1273px !important;
+    }
 }
