@@ -89,14 +89,24 @@ pageFlip.on("flip", function () {
 function resizeStage() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    const stageWidth = 1800;
+    
+    // 【新增】判断是否为手机端
+    const isMobile = window.innerWidth <= 1024;
+    
+    // 【关键修改】手机端按单页宽 900 计算，电脑端按双页宽 1800 计算
+    const stageWidth = isMobile ? 900 : 1800;
     const stageHeight = 1273;
+    
+    // 手机端留白稍微少一点，让画册更大
     const scaleX = screenWidth / stageWidth;
     const scaleY = screenHeight / stageHeight;
-    const scale = Math.min(scaleX, scaleY) * 0.95;
+    const scale = Math.min(scaleX, scaleY) * (isMobile ? 0.98 : 0.95);
 
     stage.style.transform = `scale(${scale})`;
     stage.style.transformOrigin = 'center center';
+    
+    // 【新增】动态设置 stage 的宽度，防止手机端两边出现巨大空白
+    stage.style.width = isMobile ? '900px' : '1800px';
 }
 window.addEventListener('load', resizeStage);
 window.addEventListener('resize', resizeStage);
